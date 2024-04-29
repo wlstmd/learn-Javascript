@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input type="text" name="" id="num1" autocomplete="off">
+  <input type="text" name="" id="num2" autocomplete="off">
+  <button onclick="plus()">더하기</button>
+  <div id="result"></div>
+  <script>
+    function plus() {
+      number1 = document.getElementById('num1').value;
+      number2 = document.getElementById('num2').value;
+      if(number1 == "" && number2 =="" || number1 == "" || number2 == "") {
+        alert('숫자를 모두 입력해주세요.')
+      } else {
+        document.getElementById('result').innerHTML = `결과값 : ${+number1 + +number2}`;
+      }
+    }
+  </script>
+</body>
+</html>

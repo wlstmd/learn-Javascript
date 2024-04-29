@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <form action="">
+    <input id="price" type="text" placeholder="가격">
+    <input id="val" type="text" placeholder="할인율">
+    <button onclick="calc()">할인 가격 계산하기</button>
+  </form>
+  <script>
+    function calc() {
+      event.preventDefault();
+      let price = document.getElementById('price').value;
+      let val = document.getElementById('val').value;
+      const discount = Math.floor((price * val) / 100);
+      document.write(`상품의 원래가격은 ${price}원 이고, 할인율은 ${val}%입니다. ${discount}을 절약한 ${price - discount}원에 살 수 있습니다.`)
+    }
+  </script>
+</body>
+</html>

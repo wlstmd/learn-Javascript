@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lotto</title>
+    <style>
+      .ball {
+        display: inline-block;
+        border: 1px solid black;
+        border-radius: 20px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 20px;
+        text-align: center;
+        margin-right: 20px;
+        margin: 5px;
+        background-color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="result">추첨 결과는 ?</div>
+    <div id="bonus">보너스:</div>
+    <script>
+      const candidate = Array(45)
+        .fill()
+        .map((v, i) => i + 1);
+
+      const shuffle = [];
+      for (let i = candidate.length; i > 0; i--) {
+        const random = Math.floor(Math.random() * i);
+        const spliceArray = candidate.splice(random, 1);
+        const value = spliceArray[0];
+        shuffle.push(value);
+      }
+
+      const winBalls = shuffle.slice(0, 6).sort((a, b) => a - b);
+      const bonus = shuffle[6];
+
+      function createBall(query, value) {
+        const $ball = document.createElement("div");
+        $ball.className = "ball";
+        $ball.textContent = value;
+        query.appendChild($ball);
+      }
+
+      setTimeout(() => {
+        let delay = 0;
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            createBall(document.querySelector("#result"), winBalls[i]);
+          }, delay);
+          delay += 1000;
+        }
+        setTimeout(() => {
+          createBall(document.querySelector("#bonus"), bonus);
+        }, delay);
+      }, 1000);
+    </script>
+  </body>
+</html>

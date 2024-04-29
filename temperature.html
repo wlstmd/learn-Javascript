@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>온도 변환기</title>
+  <style>
+    input {
+      margin: 4px;
+      padding: 4px;
+      font-size: bold;
+    }
+  </style>
+</head>
+<body>
+  <label>섭씨<input type="text" id="sub" autocomplete="off"></label> <button onclick="res1()">화씨로 변환</button><br>
+  <label>화씨<input type="text" id="hwa" autocomplete="off"></label> <button onclick="res2()">섭씨로 변환</button><br>
+
+  <div id="result1"></div>
+  <div id="result2"></div>
+  <script>
+    function res1() {
+      let sub = document.getElementById('sub').value;
+      let val1 = sub * 9 / 5 + 32;
+      document.getElementById('result1').innerHTML = `=> 섭씨온도 ${sub}는 화씨온도로 ${Math.round(val1)}입니다.`;
+    }
+
+    function res2() {
+      let hwa = document.getElementById('hwa').value;
+      let val2 = (hwa - 32) * 5 / 9;
+      document.getElementById('result2').innerHTML = `=> 화씨온도 ${hwa}는 섭씨온도로 ${Math.round(val2)}입니다.`;
+    }
+  </script>
+</body>
+</html>

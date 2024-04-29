@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <title>끝말잇기 게임</title>
+  </head>
+  <body>
+    <div class="container">
+      <div id="person" style="display: inline"></div>
+      <span>명 중</span>
+      <div id="count" style="display: inline"></div>
+      <span>번째 참가자</span><br />
+      <span
+        >제시어 :
+        <h3 id="display" style="display: inline"></h3>
+        <br
+      /></span>
+      <span
+        >라운드 :
+        <div id="round" style="display: inline">1</div>
+        <br
+      /></span>
+      <span>남은 시간: <span id="timer-display">10</span>초</span>
+      <input
+        type="text"
+        id="word"
+        placeholder="한글 단어 입력..."
+        maxlength="3"
+      />
+      <div>단어 리스트</div>
+      <div id="wordList"></div>
+    </div>
+
+    <script>
+      const $input = document.querySelector("#word");
+      const $display = document.querySelector("#display");
+      const $count = document.querySelector("#count");
+      const $round = document.querySelector("#round");
+      const $wordList = document.querySelector("#wordList");
+      const $person = document.querySelector("#person");
+
+      let players;
+      let round = 1;
+      let word;
+      let newWord = "";
+      let turnCount = 0;
+      const usedWords = [];
+
+      let timeoutId;
+      let timeLeft = 10;
+
+      let newGameButton;
+
+      const isValidWord = (word) => {
+        const koreanRegex = /^[가-힣]+$/;
+        const initialConsonantRegex = /^[ㄱ-ㅎ]{2,}/;
+
+        // 초성이 2개 이상인 경우 허용하지 않음
+        if (initialConsonantRegex.test(word)) {
+          return false;
+        }
+
+        // 한국어 단어만 허용
+        if (!koreanRegex.test(word)) {
+          return false;
+        }
+
+        // 단어 길이가 2자 이상 3자 이하인 경우만 허용
+        return word.length >= 2 && word.length <= 3;
+      };
+
+      const checkNewWord = () => {
+        if (!newWord) {
+          return false;
+        }
+
+        if (!isValidWord(newWord)) {
+          $input.value = ""; // 입력된 값 초기화
+          return false;
+        }
+
+        if (usedWords.includes(newWord)) {
+          alert("중복된 단어입니다. 다시 입력하세요.");
+          $input.value = ""; // 입력된 값 초기화
+          $input.focus();
+          return false;
+        }
+
+        return true;
+      };
+
+      const askForPlayers = () => {
+        players = prompt("참가 인원을 입력해주세요.");
+        parseInt(players);
+        if (isNaN(players) || players < 2) {
+          alert(
+            "올바른 참가 인원 수를 입력해주세요. 최소 2명 이상이어야 합니다."
+          );
+          askForPlayers();
+        } else {
+          $person.innerHTML = players;
+          init();
+        }
+      };
+
+      const init = () => {
+        if (newGameButton) {
+          newGameButton.remove();
+        }
+
+        round = 1;
+        word = "";
+        newWord = "";
+        turnCount = 0;
+        usedWords.length = 0;
+        timeLeft = 10;
+        clearTimeout(timeoutId);
+        $round.innerHTML = round;
+        $count.innerHTML = turnCount + 1;
+        $wordList.innerHTML = "";
+        $display.innerHTML = "";
+        $input.value = "";
+        startTimer();
+      };
+
+      const updateTimerDisplay = () => {
+        const $timerDisplay = document.getElementById("timer-display");
+        $timerDisplay.textContent = timeLeft;
+      };
+
+      const startTimer = () => {
+        timeLeft = 10;
+        updateTimerDisplay();
+        clearTimeout(timeoutId);
+        countdown();
+      };
+
+      const countdown = () => {
+        timeoutId = setTimeout(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          if (timeLeft === 0) {
+            endGame();
+          } else {
+            countdown();
+          }
+        }, 1000);
+      };
+
+      const endGame = () => {
+        alert("경기 종료");
+        newGameButton = document.createElement("button");
+        newGameButton.textContent = "새로운 게임 시작";
+        newGameButton.addEventListener("click", askForPlayers);
+        document.body.appendChild(newGameButton);
+      };
+
+      const onClickButton = () => {
+        if (!checkNewWord()) {
+          return;
+        }
+
+        if (!word) {
+          word = newWord;
+        } else {
+          if (word[word.length - 1] !== newWord[0]) {
+            endGame();
+            return;
+          } else {
+            word = newWord;
+          }
+        }
+
+        $display.innerHTML = word;
+        updateCount();
+        usedWords.push(word);
+        updateWordList();
+        startTimer();
+
+        $input.value = "";
+        newWord = "";
+      };
+
+      const onInput = (event) => {
+        newWord = event.target.value;
+      };
+
+      const updateCount = () => {
+        if (turnCount >= players - 1) {
+          turnCount = 0;
+          round++;
+          $round.innerHTML = round;
+        } else {
+          turnCount++;
+        }
+        $count.innerHTML = turnCount + 1;
+      };
+
+      const updateWordList = () => {
+        $wordList.innerHTML = "";
+        const reversedWords = [...usedWords].reverse();
+        reversedWords.forEach((word) => {
+          const wordElement = document.createElement("div");
+          wordElement.textContent = word;
+          $wordList.appendChild(wordElement);
+        });
+      };
+
+      $input.addEventListener("input", onInput);
+      $input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          if (isValidWord(newWord)) {
+            onClickButton();
+          } else if (!newWord) {
+            alert("단어를 입력하세요.");
+            $input.value = ""; // 입력된 값 초기화
+            $input.focus();
+          }
+        }
+      });
+      $input.addEventListener("blur", startTimer);
+
+      askForPlayers();
+    </script>
+  </body>
+</html>
