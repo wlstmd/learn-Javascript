@@ -82,9 +82,7 @@
         }
 
         if (usedWords.includes(newWord)) {
-          alert("중복된 단어입니다. 다시 입력하세요.");
-          $input.value = ""; // 입력된 값 초기화
-          $input.focus();
+          endGame(); // 중복된 단어 입력 시 게임 종료
           return false;
         }
 
