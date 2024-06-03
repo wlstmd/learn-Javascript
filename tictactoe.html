@@ -26,41 +26,33 @@
       const $result = document.createElement("div");
       const rows = [];
       let turn = "O";
-      // let moves = 0; // 무승부 체크를 위한 moves 변수 추가
+      let moves = 0; // 무승부 체크를 위한 moves 변수 추가
 
       const callback = (event) => {
         if (event.target.textContent !== "") {
-          // 칸이 이미 채워져 있는가?
           console.log("빈칸이 아닙니다.");
-          return;
+        } else {
+          console.log("빈칸입니다.");
+          event.target.textContent = turn;
+          checkWinner(event.target);
+          turn = turn === "X" ? "O" : "X";
+          moves++; // 무승부 체크를 위해 moves 증가
         }
-        // 빈칸이면
-        console.log("빈칸입니다");
-        event.target.textContent = turn;
-        const hasWinner = checkWinner(event.target);
-        // 승자가 있으면
-        if (hasWinner) {
-          $result.textContent = `${turn}님이 승리!`;
-          $table.removeEventListener("click", callback);
-          resetGame();
-          return;
-        }
-        // 승자가 없으면
-        const draw = rows.flat().every((cell) => cell.textContent);
-        if (draw) {
-          $result.textContent = `무승부`;
-          resetGame();
-          return;
-        }
-        turn = turn === "X" ? "O" : "X";
       };
 
       const checkWinner = (target) => {
-        const rowIndex = target.parentNode.rowIndex; // tr의 행 인덱스
-        const cellIndex = target.cellIndex; // td의 열 인덱스
+        let rowIndex, cellIndex;
+        rows.forEach((row, ri) => {
+          row.forEach((cell, ci) => {
+            if (cell === target) {
+              rowIndex = ri;
+              cellIndex = ci;
+            }
+          });
+        });
 
-        // 세 칸 다 채워졌나?
         let hasWinner = false;
+
         // 가로줄 검사
         if (
           rows[rowIndex][0].textContent === turn &&
@@ -69,6 +61,7 @@
         ) {
           hasWinner = true;
         }
+
         // 세로줄 검사
         if (
           rows[0][cellIndex].textContent === turn &&
@@ -77,27 +70,42 @@
         ) {
           hasWinner = true;
         }
-        // 대각선 검사
-        if (
-          rows[0][0].textContent === turn &&
-          rows[1][1].textContent === turn &&
-          rows[2][2].textContent === turn
-        ) {
-          hasWinner = true;
+
+        // 대각선 검사 1
+        if (rowIndex === cellIndex) {
+          if (
+            rows[0][0].textContent === turn &&
+            rows[1][1].textContent === turn &&
+            rows[2][2].textContent === turn
+          ) {
+            hasWinner = true;
+          }
         }
-        if (
-          rows[0][2].textContent === turn &&
-          rows[1][1].textContent === turn &&
-          rows[2][0].textContent === turn
-        ) {
-          hasWinner = true;
+
+        // 대각선 검사 2
+        if (rowIndex + cellIndex === 2) {
+          if (
+            rows[0][2].textContent === turn &&
+            rows[1][1].textContent === turn &&
+            rows[2][0].textContent === turn
+          ) {
+            hasWinner = true;
+          }
         }
-        return hasWinner;
+
+        if (hasWinner) {
+          alert(`${turn} 플레이어가 이겼습니다!`);
+          resetGame(); // 승리 시 게임 초기화
+        } else if (moves === 9) {
+          // 무승부 체크
+          alert("무승부입니다!");
+          resetGame(); // 무승부 시 게임 초기화
+        }
       };
 
       const resetGame = () => {
         turn = turn === "X" ? "O" : "X"; // 다음 게임을 위해 turn 변수 변경
-        // moves = 0; // moves 초기화
+        moves = 0; // moves 초기화
         rows.forEach((row) => {
           row.forEach((td) => {
             td.textContent = "";
